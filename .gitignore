@@ -1,0 +1,17 @@
+# Vector database and cloned target repos
+chroma_db/
+chroma_db_snapshot/
+indexed_repo/
+
+# Secrets — never commit
+.env
+
+# Python cache and virtual environments
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Scratch / personal notes
+*.txt
+!requirements.txt

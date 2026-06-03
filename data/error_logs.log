@@ -1,0 +1,29 @@
+
+2026-06-02 14:22:00,512 INFO     uvicorn.error:main.py:55: Started server process [8081]
+2026-06-02 14:22:00,514 INFO     uvicorn.error:on.py:23: Waiting for application startup.
+2026-06-02 14:22:00,521 INFO     uvicorn.error:on.py:46: Application startup complete.
+2026-06-02 14:22:01,103 INFO     sentinel:utils.py:12: Analysis completed | service=auth-service | status=HEALTHY
+2026-06-02 14:22:03,287 INFO     sentinel:utils.py:12: Analysis completed | service=payment-gateway | status=HEALTHY
+2026-06-02 14:22:05,401 INFO     sentinel:utils.py:12: Analysis completed | service=order-processor | status=HEALTHY
+2026-06-02 14:22:09,774 WARN     sentinel:utils.py:12: Analysis completed | service=inventory-service | status=DEGRADED
+2026-06-02 14:22:13,190 INFO     sentinel:utils.py:12: Analysis completed | service=user-profile-service | status=HEALTHY
+2026-06-02 14:22:17,652 WARN     sentinel:utils.py:12: Analysis completed | service=payment-gateway | status=DEGRADED
+2026-06-02 14:22:19,001 ERROR    uvicorn.error:protocols.py:551: Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Python311\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 399, in run_asgi
+    result = await app(self.scope, self.receive, self.send)
+  File "C:\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 70, in __call__
+    return await self.app(scope, receive, send)
+  File "C:\Python311\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Python311\Lib\site-packages\starlette\routing.py", line 79, in handle
+    await route.handle(scope, receive, send)
+  File "/app/test-python-code/main.py", line 26, in analyze_metric
+    report = analyze_single_metric(metric)
+  File "/app/test-python-code/services.py", line 44, in analyze_single_metric
+    error_rate = compute_error_rate(metric)
+  File "/app/test-python-code/services.py", line 13, in compute_error_rate
+    raise RuntimeError(
+RuntimeError: SLA metric computation failed for 'recommendation-engine': telemetry pipeline returned inconsistent state.
