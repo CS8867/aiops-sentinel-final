@@ -13,6 +13,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 
 from langchain_community.document_loaders.generic import GenericLoader
@@ -26,6 +27,14 @@ CHROMA_DIR = "./chroma_db"
 REPO_META_PATH = os.path.join(CHROMA_DIR, "repo_meta.json")
 
 
+def _rmtree(path: str) -> None:
+    """Remove a directory tree, handling read-only files (common in git repos on Windows)."""
+    def _on_error(func, p, _exc):
+        os.chmod(p, stat.S_IWRITE)
+        func(p)
+    shutil.rmtree(path, onerror=_on_error)
+
+
 def _repo_name_from_url(url: str) -> str:
     """Extract the repository name from a GitHub URL."""
     name = url.rstrip("/").split("/")[-1]
@@ -35,7 +44,7 @@ def _repo_name_from_url(url: str) -> str:
 def clone_repo(repo_url: str, branch: str | None = None, github_pat: str | None = None) -> str:
     """Clone a GitHub repository to INDEXED_REPO_DIR and return its path."""
     if os.path.exists(INDEXED_REPO_DIR):
-        shutil.rmtree(INDEXED_REPO_DIR)
+        _rmtree(INDEXED_REPO_DIR)
 
     clone_url = repo_url
     if github_pat and "github.com" in repo_url:
@@ -63,7 +72,7 @@ def index_repo(repo_path: str, repo_url: str = "") -> int:
         raise FileNotFoundError(f"Repository not found at '{repo_path}'")
 
     if os.path.exists(CHROMA_DIR):
-        shutil.rmtree(CHROMA_DIR)
+        _rmtree(CHROMA_DIR)
         print("   Cleared existing vector store.")
 
     print("1. Loading Python files...")
