@@ -67,6 +67,9 @@ def index_repo(repo_path: str, repo_url: str = "") -> int:
     """
     Index Python files from repo_path into ChromaDB and write repo_meta.json.
     Returns the number of chunks stored.
+
+    Run this from the command line with Streamlit stopped to avoid file-lock
+    conflicts on Windows.
     """
     if not os.path.exists(repo_path):
         raise FileNotFoundError(f"Repository not found at '{repo_path}'")

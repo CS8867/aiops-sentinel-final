@@ -1,7 +1,5 @@
 import json
 import re
-import subprocess
-import sys
 
 import streamlit as st
 import os
@@ -55,45 +53,19 @@ with st.sidebar:
         os.environ[GITHUB_PAT_ENV] = github_pat
 
     st.divider()
-    st.subheader("Target Repository")
 
     meta = _load_repo_meta()
     if meta:
         indexed_label = meta.get("repo_url") or meta.get("repo_name") or meta.get("repo_dir")
-        st.caption(f"Indexed: `{indexed_label}`")
-        # Keep GITHUB_OWNER / GITHUB_REPO in sync with whatever is indexed
+        st.caption(f"Indexed repo: `{indexed_label}`")
+        # Auto-populate GITHUB_OWNER / GITHUB_REPO from the indexed repo URL
         owner, repo = _parse_github_url(meta.get("repo_url", ""))
         if owner and not os.environ.get(GITHUB_OWNER_ENV):
             os.environ[GITHUB_OWNER_ENV] = owner
         if repo and not os.environ.get(GITHUB_REPO_ENV):
             os.environ[GITHUB_REPO_ENV] = repo
     else:
-        st.caption("No repository indexed yet. Using bundled sample data.")
-
-    repo_url_input = st.text_input(
-        "GitHub Repo URL",
-        placeholder="https://github.com/owner/repo  or  owner/repo",
-    )
-    if st.button("Index Repository"):
-        if not repo_url_input.strip():
-            st.error("Enter a GitHub URL or owner/repo shorthand.")
-        else:
-            with st.spinner(f"Cloning and indexing {repo_url_input.strip()}…"):
-                result = subprocess.run(
-                    [sys.executable, "scripts/index_codebase.py", "--repo-url", repo_url_input.strip()],
-                    capture_output=True,
-                    text=True,
-                )
-            if result.returncode == 0:
-                owner, repo = _parse_github_url(repo_url_input.strip())
-                if owner:
-                    os.environ[GITHUB_OWNER_ENV] = owner
-                if repo:
-                    os.environ[GITHUB_REPO_ENV] = repo
-                st.success("Repository indexed successfully.")
-                st.rerun()
-            else:
-                st.error(f"Indexing failed:\n\n```\n{result.stderr or result.stdout}\n```")
+        st.caption("No repo indexed. Run `python scripts/index_codebase.py --repo-url <url>` before starting the app.")
 
     st.divider()
     uploaded_csv = st.file_uploader("Upload Metrics (CSV)", type=["csv"])
